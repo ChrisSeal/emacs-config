@@ -16,3 +16,6 @@
 (global-set-key (kbd "C-c o")
 		(lambda () (interactive) (find-file "~/ToDo/refile.org")))
 (global-set-key (kbd "<f8> <f8>") 'cs/todays-page)
+(global-set-key (kbd "C-c l") 'org-store-link)
+(global-set-key (kbd "C-c C-l") 'org-insert-link)
+(define-key org-mode-map "\C-cn" 'org-mactions-new-numbered-action)

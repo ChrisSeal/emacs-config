@@ -15,7 +15,7 @@
 
 (setq org-todo-keywords
       (quote ((sequence "TODO(t)" "NEXT(n!)" "WEEKLY-GOAL(w)" "|" "DONE(d!)")
-              (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "MEETING"))))
+              (sequence "WAITING(a@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "MEETING"))))
 (setq org-use-fast-todo-selection t)
 (setq org-treat-S-cursor-todo-selection-as-state-change nil)
 
@@ -653,7 +653,7 @@ A prefix arg forces clock in of the default task."
                             ("@office" . ?o)
                             ("@home" . ?H)
                             (:endgroup)
-                            ("WAITING" . ?w)
+                            ("WAITING" . ?a)
                             ("HOLD" . ?h)
                             ("PERSONAL" . ?P)
                             ("WORK" . ?W)
@@ -831,3 +831,68 @@ Late deadlines first, then scheduled, then non-late deadlines"
 
 (add-hook 'org-after-todo-state-change-hook 'bh/mark-next-parent-tasks-todo 'append)
 (add-hook 'org-clock-in-hook 'bh/mark-next-parent-tasks-todo 'append)
+
+(defcustom org-mactions-numbered-action-format "TODO Action #%d "
+  "Default structure of the headling of a new action.
+    %d will become the number of the action."
+  :group 'org-edit-structure
+  :type 'string)
+
+(defcustom org-mactions-change-id-on-copy t
+  "Non-nil means make new IDs in copied actions.
+If an action copied with the command `org-mactions-collect-todos-in-subtree'
+contains an ID, that ID will be replaced with a new one."
+  :group 'org-edit-structure
+  :type 'string)
+
+(defun org-mactions-new-numbered-action (&optional inline)
+  "Insert a new numbered action, using `org-mactions-numbered-action-format'.
+    With prefix argument, insert an inline task."
+  (interactive "P")
+  (let* ((num (let ((re "\\`#\\([0-9]+\\)\\'"))
+                (1+ (apply 'max 0
+                           (mapcar
+                            (lambda (e)
+                              (if (string-match re (car e))
+                                  (string-to-number (match-string 1 (car e)))
+                                0))
+                            (org-get-buffer-tags))))))
+         (tag (concat "#" (number-to-string num))))
+    (if inline
+        (org-inlinetask-insert-task)
+      (org-insert-heading 'force))
+    (unless (eql (char-before) ?\ ) (insert " "))
+    (insert (format org-mactions-numbered-action-format num))
+    (org-toggle-tag tag 'on)
+    (if (= (point-max) (point-at-bol))
+        (save-excursion (goto-char (point-at-eol)) (insert "\n")))
+    (unless (eql (char-before) ?\ ) (insert " "))))
+
+(defun org-mactions-collect-todos-in-subtree ()
+  "Collect all TODO items in the current subtree into a flat list."
+  (interactive)
+  (let ((buf (get-buffer-create "Org TODO Collect"))
+        (cnt 0) beg end string s)
+    (with-current-buffer buf (erase-buffer) (org-mode))
+    (org-map-entries
+     (lambda ()
+       (setq beg (point) end (org-end-of-subtree t t) cnt (1+ cnt)
+             string (buffer-substring beg end)
+             s 0)
+       (when org-mactions-change-id-on-copy
+         (while (string-match "^\\([ \t]*:ID:\\)[ \t\n]+\\([^ \t\n]+\\)[ \t]*$"
+                              string s)
+           (setq s (match-end 1)
+                 string (replace-match (concat "\\1 "
+                                               (save-match-data (org-id-new)))
+                                       t nil string))))
+       (with-current-buffer buf (org-paste-subtree 1 string)
+                            (goto-char (point-max))))
+     (format "TODO={%s}" (regexp-opt org-not-done-keywords))
+     'tree)
+    (if (= cnt 0)
+        (message "No TODO items in subtree")
+      (message "%d TODO entries copied to kill ring" cnt)
+      (prog1 (with-current-buffer buf
+               (kill-new (buffer-string)))
+        (kill-buffer buf)))))
