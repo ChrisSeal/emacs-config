@@ -98,6 +98,7 @@
 ;; Compact the block agenda view and remove tags
 (setq org-agenda-compact-blocks t)
 (setq org-agenda-remove-tags t)
+(setq org-agenda-show-tags-regexp "URGENT")
 
 ;; Sticky agendas
 ;;(setq org-agenda-sticky t)
@@ -652,12 +653,14 @@ A prefix arg forces clock in of the default task."
                             ("@errand" . ?e)
                             ("@office" . ?o)
                             ("@home" . ?H)
+			    ("important" . ?i)
+			    ("urgent" . ?u)
                             (:endgroup)
                             ("WAITING" . ?a)
                             ("HOLD" . ?h)
                             ("PERSONAL" . ?P)
                             ("WORK" . ?W)
-			    ("ICE" . ?i)
+			    ("ICE" . ?I)
                             ("NOTE" . ?n)
                             ("CANCELLED" . ?c)
                             ("FLAGGED" . ??))))
