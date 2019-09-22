@@ -93,7 +93,7 @@ Null prefix argument turns off the mode."
     ("~/Dropbox/OrgFiles/refile.org" "~/Dropbox/OrgFiles/mytardis.org" "~/Dropbox/OrgFiles/gtd.org" "~/Dropbox/OrgFiles/Duncan.org" "~/Dropbox/OrgFiles/personal.org" "~/Dropbox/OrgFiles/ice.org")))
  '(package-selected-packages
    (quote
-    (magit color-theme-solarized org-plus-contrib org-agenda-property ivy-omni-org ivy-yasnippet ivy org-super-agenda auctex org wc-goal-mode toml-mode origami json-mode py-autopep8 material-theme jedi flycheck elpy ein better-defaults))))
+    (fill-column-indicator pyenv-mode magit color-theme-solarized org-plus-contrib org-agenda-property ivy-omni-org ivy-yasnippet ivy org-super-agenda auctex org wc-goal-mode toml-mode origami json-mode py-autopep8 material-theme jedi flycheck elpy ein better-defaults))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

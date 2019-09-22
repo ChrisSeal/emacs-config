@@ -899,3 +899,5 @@ contains an ID, that ID will be replaced with a new one."
       (prog1 (with-current-buffer buf
                (kill-new (buffer-string)))
         (kill-buffer buf)))))
+
+(run-with-idle-timer 300 t (lambda () (save-window-excursion (org-agenda nil " "))))
